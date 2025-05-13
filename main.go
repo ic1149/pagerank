@@ -1,6 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+	"sort"
+)
+
+func roundFloat32(f float32, precision int) float32 {
+	shift := math.Pow10(precision)
+	return float32(math.Round(float64(f)*shift) / shift)
+}
 
 func main() {
 	matrix := map[string]map[string]bool{
@@ -19,7 +28,13 @@ func main() {
 	const d float32 = 0.85
 
 	for range 10 {
-		for k := range prs {
+		keys := make([]string, 0, len(prs))
+		for key := range prs {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+
+		for _, k := range keys {
 			var sum float32 = 0
 
 			for i, w := range matrix {
@@ -33,9 +48,10 @@ func main() {
 					sum += d * prs[i] / c
 				}
 			}
-			prs[k] = 1 - d + sum
-			fmt.Printf("%v:%v", k, prs[k])
+			prs[k] = roundFloat32(1-d+sum, 3)
+			fmt.Printf("%v:%v ", k, prs[k])
 		}
+		fmt.Print("\n")
 
 	}
 
